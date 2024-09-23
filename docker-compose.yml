@@ -34,16 +34,6 @@ services:
       - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql # Mount an SQL initialization file into the container to create the schema
     restart: on-failure
 
-  web:
-    build:
-      context: ./nginx
-    ports:
-      - "8080:80"
-    depends_on:
-      - db
-      - flask-app
-    #restart: always
-
 volumes:
   # Define named volumes
   db_data: # This volume can be used for persistent storage if needed (not currently utilized in the service definitions)

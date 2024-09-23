@@ -1,3 +1,24 @@
+function displayGreeting() {
+    const now = new Date();
+    const hours = now.getHours();
+
+    let greeting;
+
+    if (hours < 12) {
+        greeting = "Good Morning!";
+    } else if (hours < 18) {
+        greeting = "Good Afternoon!";
+    } else {
+        greeting = "Good Evening!";
+    }
+
+    document.getElementById('greeting').innerText = greeting;
+    document.getElementById('dateTime').innerText = `Date & Time: ${now.toLocaleString()}`;
+}
+function startTimer() {
+    startTime = new Date();
+}
+
 async function submitTest() {
     const endTime = new Date();
     const form = document.getElementById('onlineTestForm');
@@ -21,12 +42,13 @@ async function submitTest() {
     // Retrieve the user's name from the form
     const username = formData.get('name');
 
+    //debugger
     // Alert the user with their score and time taken
     alert(`Hello ${username},\nYou scored ${percentageScore.toFixed(2)}/100.\nTime taken: ${totalTime} seconds.`);
 
     // Submit Score
     try {
-        const response = await fetch('http://flask-app:5000/submit_score', {
+        const response = await fetch('http://127.0.0.1:5000/submit_score', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -45,6 +67,6 @@ async function submitTest() {
     } catch (error) {
         console.error('Error:', error);
     }
-
-    return false; // Prevent actual form submission
 }
+
+document.getElementById('onlineTestForm').addEventListener('submit', submitTest);
