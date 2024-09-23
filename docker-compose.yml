@@ -4,7 +4,7 @@ services:
   # Define the services that make up the application
   flask-app:
     # Name of the Flask application service
-    build: . # Build the Docker image from the current directory (where the Dockerfile is located)
+    build: ./backend # Build the Docker image from the current directory (where the Dockerfile is located)
     ports:
       # Port mapping
       - "5000:5000" # Expose port 5000 of the container to port 5000 on the host machine
@@ -17,6 +17,7 @@ services:
     depends_on:
       # Specify dependencies
       - db # The Flask app depends on the 'db' service to be up and running
+    restart: always
 
   db:
     # Name of the MySQL database service
@@ -30,7 +31,18 @@ services:
       - MYSQL_DATABASE=scores_db # Create a database named 'scores_db' on startup
     volumes:
       # Volume mapping
-      - ./init.sql:/docker-entrypoint-initdb.d/init.sql # Mount an SQL initialization file into the container to create the schema
+      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql # Mount an SQL initialization file into the container to create the schema
+    restart: on-failure
+
+  web:
+    build:
+      context: ./nginx
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+      - flask-app
+    #restart: always
 
 volumes:
   # Define named volumes
