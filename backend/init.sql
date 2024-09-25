@@ -1,11 +1,19 @@
--- Create the 'scores' table if it does not already exist
-CREATE TABLE IF NOT EXISTS scores (
-    -- 'id' column: Integer type, auto-incrementing, serves as the primary key
+CREATE TABLE IF NOT EXISTS markets (
     id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    city VARCHAR(50) NOT NULL,
+    state VARCHAR(50) NOT NULL,
+    postal_code VARCHAR(20) NOT NULL,
+    latitude FLOAT NOT NULL,
+    longitude FLOAT NOT NULL,
+    rating FLOAT DEFAULT 0
+);
 
-    -- 'username' column: Variable character string of up to 50 characters, cannot be null
+CREATE TABLE IF NOT EXISTS reviews (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    market_id INT NOT NULL,
     username VARCHAR(50) NOT NULL,
-
-    -- 'score' column: Floating point number, cannot be null
-    score FLOAT NOT NULL
+    text TEXT,
+    score INT CHECK (score >= 1 AND score <= 5),
+    FOREIGN KEY (market_id) REFERENCES markets(id) ON DELETE CASCADE
 );
