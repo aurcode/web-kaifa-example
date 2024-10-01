@@ -1,5 +1,6 @@
 Flask
 Flask-SQLAlchemy
+pandas
 PyMySQL
 cryptography
 flask-cors

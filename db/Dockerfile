@@ -11,10 +11,9 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the rest of the application code
-COPY app.py .
-
-# Expose the port on which the application runs
-EXPOSE 5000
+COPY Export.csv Export.csv
+COPY migrations.py .
 
 # Command to run the application, waiting for MySQL to be ready
-CMD ["python", "app.py"]
+CMD ["python", "migrations.py"]
+#CMD ["tail", "-f", "/dev/null"]

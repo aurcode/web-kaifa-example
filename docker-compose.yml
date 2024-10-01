@@ -1,39 +1,22 @@
-version: '3.8' # Specifies the version of Docker Compose to use
-
 services:
-  # Define the services that make up the application
-  flask-app:
-    # Name of the Flask application service
-    build: ./backend # Build the Docker image from the current directory (where the Dockerfile is located)
-    ports:
-      # Port mapping
-      - "5000:5000" # Expose port 5000 of the container to port 5000 on the host machine
-    environment:
-      # Environment variables for the Flask app
-      - DATABASE_HOST=db # The hostname of the database service
-      - DATABASE_USER=root # Database username
-      - DATABASE_PASSWORD=YourPassword123! # Database password (change to a strong password)
-      - DATABASE_NAME=scores_db # Name of the database to use
-    depends_on:
-      # Specify dependencies
-      - db # The Flask app depends on the 'db' service to be up and running
-    restart: always
-
   db:
-    # Name of the MySQL database service
-    image: mysql:8.0 # Use the official MySQL version 8.0 Docker image
+    image: mysql:8.0
     ports:
-      # Port mapping for the database
-      - "3306:3306" # Expose port 3306 of the container to port 3306 on the host machine
+      - "3306:3306"
     environment:
-      # Environment variables for the MySQL service
-      - MYSQL_ROOT_PASSWORD=YourPassword123! # Root password for MySQL (change to a strong password)
-      - MYSQL_DATABASE=scores_db # Create a database named 'scores_db' on startup
+      - MYSQL_ROOT_PASSWORD=YourPassword123!
+      - MYSQL_DATABASE=scores_db
     volumes:
-      # Volume mapping
-      - ./backend/init.sql:/docker-entrypoint-initdb.d/init.sql # Mount an SQL initialization file into the container to create the schema
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
     restart: on-failure
 
-volumes:
-  # Define named volumes
-  db_data: # This volume can be used for persistent storage if needed (not currently utilized in the service definitions)
+  migrations:
+    build: ./db
+    environment:
+      - DATABASE_HOST=db
+      - DATABASE_USER=root
+      - DATABASE_PASSWORD=YourPassword123!
+      - DATABASE_NAME=scores_db
+    depends_on:
+      - db
+    restart: always

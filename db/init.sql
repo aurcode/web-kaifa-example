@@ -1,12 +1,11 @@
 CREATE TABLE IF NOT EXISTS markets (
     id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
-    city VARCHAR(50) NOT NULL,
-    state VARCHAR(50) NOT NULL,
-    postal_code VARCHAR(20) NOT NULL,
-    latitude FLOAT NOT NULL,
-    longitude FLOAT NOT NULL,
-    rating FLOAT DEFAULT 0
+    city VARCHAR(200) DEFAULT NULL,
+    state VARCHAR(50) DEFAULT NULL,
+    postal_code VARCHAR(20) DEFAULT NULL,
+    latitude FLOAT DEFAULT NULL,
+    longitude FLOAT DEFAULT NULL
 );
 
 CREATE TABLE IF NOT EXISTS reviews (
