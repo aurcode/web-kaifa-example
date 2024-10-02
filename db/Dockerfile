@@ -15,5 +15,5 @@ COPY Export.csv Export.csv
 COPY migrations.py .
 
 # Command to run the application, waiting for MySQL to be ready
-CMD ["python", "migrations.py"]
+#CMD ["python", "migrations.py"]
 #CMD ["tail", "-f", "/dev/null"]

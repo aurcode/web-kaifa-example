@@ -1,6 +1,4 @@
-Flask
-Flask-SQLAlchemy
-pandas
-PyMySQL
+pandas>=1.1.0
+sqlalchemy>=1.4.0
+pymysql>=0.9.0
 cryptography
-flask-cors

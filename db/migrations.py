@@ -1,6 +1,14 @@
 import pandas as pd
 from sqlalchemy import create_engine
 import os
+import logging
+
+logging.basicConfig(
+    filename='app.log',  # Log to a file
+    filemode='a',        # Overwrite the log file every time (use 'a' to append)
+    level=logging.INFO,   # Set log level
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
 
 df = pd.read_csv("Export.csv", encoding='ISO-8859-1')
 engine = create_engine(
@@ -28,11 +36,13 @@ df['longitude'] = df['longitude'].fillna(0)  # Fill missing longitude with 0
 df['city'] = df['city'].fillna('Unknown')  # Replace with 'Unknown' or any other placeholder
 df['state'] = df['state'].fillna('Unknown')  
 
+logging.info("Data loaded and processed.")
 existing_ids = pd.read_sql('SELECT id FROM markets', con=engine)['id'].tolist()
+logging.info(f"Fetched {len(existing_ids)} existing market IDs from the database.")
 
 new_records = df[~df['id'].isin(existing_ids)]
+logging.info(f"Found {len(new_records)} new records to insert.")
 
-# Step 3: Insert the new records into the database if there are any
 if not new_records.empty:
     new_records[['id', 'name', 'city', 'state', 'postal_code', 'latitude', 'longitude']].to_sql(
         'markets', 
@@ -40,15 +50,6 @@ if not new_records.empty:
         if_exists='append', 
         index=False
     )
-
-
-#Index(['FMID', 'MarketName', 'Website', 'Facebook', 'Twitter', 'Youtube',
-#       'OtherMedia', 'street', 'city', 'County', 'State', 'zip', 'Season1Date',
-#       'Season1Time', 'Season2Date', 'Season2Time', 'Season3Date',
-#       'Season3Time', 'Season4Date', 'Season4Time', 'x', 'y', 'Location',
-#       'Credit', 'WIC', 'WICcash', 'SFMNP', 'SNAP', 'Organic', 'Bakedgoods',
-#       'Cheese', 'Crafts', 'Flowers', 'Eggs', 'Seafood', 'Herbs', 'Vegetables',
-#       'Honey', 'Jams', 'Maple', 'Meat', 'Nursery', 'Nuts', 'Plants',
-#       'Poultry', 'Prepared', 'Soap', 'Trees', 'Wine', 'Coffee', 'Beans',
-#       'Fruits', 'Grains', 'Juices', 'Mushrooms', 'PetFood', 'Tofu',
-#       'WildHarvested', 'updateTime'],
+    logging.info(f"Successfully inserted {len(new_records)} new records into the 'markets' table.")
+else:
+    logging.info("No new records to insert.")
