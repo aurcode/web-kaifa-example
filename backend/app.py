@@ -90,6 +90,34 @@ def get_markets():
         'longitude': market.longitude
     } for market in markets]), 200
 
+# Endpoint to fetch a specific market by ID
+@app.route('/markets/<int:market_id>', methods=['GET'])
+def get_market_by_id(market_id):
+    market = Market.query.get(market_id)
+    if not market:
+        return jsonify({'error': 'Market not found'}), 404
+
+    # Fetch the associated reviews
+    reviews = Review.query.filter_by(market_id=market_id).all()
+
+    market_data = {
+        'id': market.id,
+        'name': market.name,
+        'city': market.city,
+        'state': market.state,
+        'postal_code': market.postal_code,
+        'latitude': market.latitude,
+        'longitude': market.longitude,
+        'reviews': [{
+            'id': review.id,
+            'username': review.username,
+            'text': review.text,
+            'score': review.score
+        } for review in reviews]
+    }
+
+    return jsonify(market_data), 200
+
 # Endpoint to fetch reviews of a specific market
 @app.route('/markets/<int:market_id>/reviews', methods=['GET'])
 def get_reviews(market_id):

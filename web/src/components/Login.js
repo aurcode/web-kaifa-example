@@ -3,12 +3,14 @@ import './Login.css';
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+//import { useAuth } from '../services/AuthContext';
 
 const Login = () => {
+  //const { login } = useAuth();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
-  const navigate = useNavigate();  // For navigating to another page upon successful login
+  const navigate = useNavigate();  // For navigating to another page
 
   const handleLogin = async (e) => {
     e.preventDefault();
@@ -23,12 +25,17 @@ const Login = () => {
 
       // Save the token in localStorage
       localStorage.setItem('access_token', access_token);
-
-      // Redirect to the desired page (e.g., Dashboard)
-      navigate('/dashboard');
+      //login();
+      // Redirect to the Dashboard page upon successful login
+      navigate('/markets');
     } catch (error) {
       setErrorMessage('Invalid username or password');
     }
+  };
+
+  // Redirect to the Register page when the "Register" button is clicked
+  const handleRegisterRedirect = () => {
+    navigate('/register');
   };
 
   return (
@@ -56,6 +63,11 @@ const Login = () => {
         {errorMessage && <p style={{ color: 'red' }}>{errorMessage}</p>}
         <button type="submit">Login</button>
       </form>
+      
+      {/* Add a Register button to redirect users to the Register page */}
+      <button className="register-button" onClick={handleRegisterRedirect}>
+        Register
+      </button>
     </div>
   );
 };
