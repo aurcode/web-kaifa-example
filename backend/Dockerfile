@@ -1,13 +1,8 @@
+# Use the official Python image
 FROM python:3.9.20-slim-bullseye
 
-RUN apt-get update && apt-get install -y \
-    default-libmysqlclient-dev \
-    pkg-config \
-    gcc \
-    && rm -rf /var/lib/apt/lists/*
-
 # Set the working directory
-WORKDIR /code
+WORKDIR /app
 
 # Copy the requirements file
 COPY requirements.txt .
@@ -15,6 +10,11 @@ COPY requirements.txt .
 # Install the dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY . .
+# Copy the rest of the application code
+COPY app.py .
 
-EXPOSE 8000
+# Expose the port on which the application runs
+EXPOSE 5000
+
+# Command to run the application, waiting for MySQL to be ready
+CMD ["python", "app.py"]
