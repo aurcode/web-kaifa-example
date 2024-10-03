@@ -9,7 +9,7 @@ app = Flask(__name__)
 CORS(app)
 
 # JWT Configuration
-app.config['JWT_SECRET_KEY'] = 'your_secret_key'  # Change this to a secure key in production
+app.config['JWT_SECRET_KEY'] = 'Krasivaya_Devuska'  # Change this to a secure key in production
 jwt = JWTManager(app)
 
 # Database Configuration
