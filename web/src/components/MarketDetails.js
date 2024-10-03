@@ -1,29 +1,39 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Navigate } from 'react-router-dom';
 import axios from 'axios';
 
 const MarketDetails = () => {
-  const { id } = useParams();  // Get the market ID from the URL
+  const { id } = useParams(); // Get the market ID from the URL
   const [market, setMarket] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [newReview, setNewReview] = useState({ score: '', text: '' });
   const [errorMessage, setErrorMessage] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useState(true); // State to manage login status
 
+  // Check for token and set login status
+  useEffect(() => {
+    const token = localStorage.getItem('access_token');
+    if (!token) {
+      setIsLoggedIn(false); // User is not logged in
+    }
+  }, []);
+
+  // Fetch market details and reviews if logged in
   useEffect(() => {
     const fetchMarketDetails = async () => {
+      const token = localStorage.getItem('access_token'); // Get the token again inside the fetch function
       try {
-        const token = localStorage.getItem('access_token');
         const marketResponse = await axios.get(`http://localhost:5000/markets/${id}`, {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         });
         setMarket(marketResponse.data);
 
         const reviewsResponse = await axios.get(`http://localhost:5000/markets/${id}/reviews`, {
           headers: {
-            Authorization: `Bearer ${token}`
-          }
+            Authorization: `Bearer ${token}`,
+          },
         });
         setReviews(reviewsResponse.data);
       } catch (error) {
@@ -31,8 +41,11 @@ const MarketDetails = () => {
       }
     };
 
-    fetchMarketDetails();
-  }, [id]);
+    // Fetch data only if the user is logged in
+    if (isLoggedIn) {
+      fetchMarketDetails();
+    }
+  }, [id, isLoggedIn]);
 
   const handleReviewChange = (e) => {
     const { name, value } = e.target;
@@ -54,15 +67,15 @@ const MarketDetails = () => {
 
       await axios.post(`http://localhost:5000/markets/${id}/reviews`, reviewToSubmit, {
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       // Fetch reviews again after adding a new one
       const reviewsResponse = await axios.get(`http://localhost:5000/markets/${id}/reviews`, {
         headers: {
-          Authorization: `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
       setReviews(reviewsResponse.data);
       setNewReview({ score: '', text: '' }); // Clear the form
@@ -71,6 +84,11 @@ const MarketDetails = () => {
       setErrorMessage('Failed to submit review. Ensure the score is between 1 and 5.');
     }
   };
+
+  // Redirect if not logged in
+  if (!isLoggedIn) {
+    return <Navigate to="/login" />;
+  }
 
   if (!market) {
     return <p>Loading...</p>;
