@@ -4,3 +4,4 @@ PyMySQL
 cryptography
 flask-cors
 Flask-JWT-Extended
+geopy
