@@ -112,33 +112,50 @@ def get_markets():
 
         query = Market.query.filter(Market.id.in_([m.id for m in markets_within_radius]))
 
-    # Apply sorting
-    if sort_direction == 'asc':
-        query = query.order_by(getattr(Market, sort_key).asc())
-    else:
-        query = query.order_by(getattr(Market, sort_key).desc())
+    # Fetch all the markets before applying sorting and pagination
+    markets = query.all()
 
-    # Get total number of markets for pagination
-    total_markets = query.count()
+    # Prepare market data including average review ranking
+    market_data = []
+    for market in markets:
+        reviews = Review.query.filter_by(market_id=market.id).all()
+        if reviews:
+            average_ranking = sum([review.score for review in reviews]) / len(reviews)
+        else:
+            average_ranking = 0  # No reviews, so average ranking is 0
 
-    # Apply pagination
-    markets = query.limit(page_size).offset((page - 1) * page_size).all()
-
-    total_pages = (total_markets + page_size - 1) // page_size  # Calculate total pages
-
-    return jsonify({
-        'markets': [{
+        market_data.append({
             'id': market.id,
             'name': market.name,
             'city': market.city,
             'state': market.state,
             'postal_code': market.postal_code,
-        } for market in markets],
+            'latitude': market.latitude,
+            'longitude': market.longitude,
+            'average_ranking': average_ranking  # Add average ranking to market data
+        })
+
+    # Apply sorting for average_ranking or other fields
+    if sort_key == 'average_ranking':
+        market_data.sort(key=lambda x: x['average_ranking'], reverse=(sort_direction == 'desc'))
+    else:
+        market_data.sort(key=lambda x: x[sort_key], reverse=(sort_direction == 'desc'))
+
+    # Paginate the sorted market data
+    total_markets = len(market_data)
+    total_pages = (total_markets + page_size - 1) // page_size  # Calculate total pages
+    paginated_data = market_data[(page - 1) * page_size: page * page_size]  # Apply pagination
+
+    return jsonify({
+        'markets': paginated_data,
         'total_pages': total_pages
     }), 200
 
+
+
 # Endpoint to fetch a specific market by ID
 @app.route('/markets/<int:market_id>', methods=['GET'])
+@jwt_required()
 def get_market_by_id(market_id):
     market = Market.query.get(market_id)
     if not market:
@@ -187,6 +204,7 @@ def delete_market(market_id):
 
 # Endpoint to fetch reviews of a specific market
 @app.route('/markets/<int:market_id>/reviews', methods=['GET'])
+@jwt_required()
 def get_reviews(market_id):
     reviews = Review.query.filter_by(market_id=market_id).all()
     return jsonify([{

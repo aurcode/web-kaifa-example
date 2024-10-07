@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Navigate } from 'react-router-dom';
+import { useParams, useNavigate, Navigate } from 'react-router-dom';
 import axios from 'axios';
 
 const MarketDetails = () => {
@@ -9,6 +9,7 @@ const MarketDetails = () => {
   const [newReview, setNewReview] = useState({ score: '', text: '' });
   const [errorMessage, setErrorMessage] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(true); // State to manage login status
+  const navigate = useNavigate(); // For the back button navigation
 
   // Check for token and set login status
   useEffect(() => {
@@ -96,6 +97,8 @@ const MarketDetails = () => {
 
   return (
     <div>
+      <button onClick={() => navigate(-1)} style={{ marginBottom: '20px' }}>Back</button>
+
       <h2>Market Details</h2>
       <table>
         <tbody>

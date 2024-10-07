@@ -25,7 +25,7 @@ const MarketList = () => {
       window.location.href = '/login';
       return;
     }
-
+  
     try {
       const response = await axios.get('http://localhost:5000/markets', {
         headers: {
@@ -42,7 +42,13 @@ const MarketList = () => {
       setMarkets(response.data.markets);
       setTotalPages(response.data.total_pages); // Update total pages based on backend response
     } catch (error) {
-      console.error('Failed to fetch markets');
+      // Check if the error is an authorization error (401 or 403)
+      if (error.response && (error.response.status === 401 || error.response.status === 403)) {
+        console.error('Authorization error, logging out');
+        handleLogout(); // Log out user on auth error
+      } else {
+        console.error('Failed to fetch markets', error);
+      }
     }
   };
 
@@ -137,6 +143,7 @@ const MarketList = () => {
             <th onClick={() => handleSort('city')}>City</th>
             <th onClick={() => handleSort('state')}>State</th>
             <th>Postal Code</th>
+            <th onClick={() => handleSort('average_ranking')}>Ranking</th> {/* New column for ranking */}
             <th>Details</th>
             <th>Actions</th>
           </tr>
@@ -149,6 +156,7 @@ const MarketList = () => {
               <td>{market.city}</td>
               <td>{market.state}</td>
               <td>{market.postal_code}</td>
+              <td>{market.average_ranking ? market.average_ranking.toFixed(1) : '0'}</td> {/* Handle missing ranking */}
               <td>
                 <Link to={`/markets/${market.id}`}>View Details</Link>
               </td>
